@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة أحمد أيمن | تمريض 2026</title>
+    <style>
+        :root { --main: #004a99; --success: #28a745; --error: #dc3545; --bg: #f8f9fa; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 0; }
+        header { background: var(--main); color: white; padding: 20px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .container { max-width: 850px; margin: 20px auto; padding: 15px; }
+        .card { background: white; padding: 25px; border-radius: 12px; text-align: center; cursor: pointer; border: 1px solid #ddd; margin-bottom: 15px; transition: 0.3s; }
+        .card:hover { border-color: var(--main); transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .section { display: none; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .q-box { font-size: 1.25rem; font-weight: bold; margin-bottom: 20px; direction: ltr; text-align: left; background: #f0f0f0; padding: 20px; border-radius: 10px; border-left: 6px solid var(--main); line-height: 1.6; color: #333; }
+        .opt { padding: 15px; border: 2px solid #eee; border-radius: 10px; cursor: pointer; margin-bottom: 12px; direction: ltr; text-align: left; font-size: 1.1rem; transition: 0.2s; }
+        .correct { background: var(--success) !important; color: white; border-color: var(--success); }
+        .wrong { background: var(--error) !important; color: white; border-color: var(--error); }
+        input, textarea { width: 100%; padding: 15px; border-radius: 10px; border: 2px solid #ddd; margin-bottom: 15px; font-size: 1.1rem; box-sizing: border-box; }
+        .btn { padding: 12px 25px; background: var(--main); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; font-size: 1.1rem; margin-bottom: 10px; }
+        .back-btn { background: #666; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; margin-bottom: 20px; }
+        .feedback { display: none; padding: 15px; border-radius: 10px; margin-top: 10px; font-weight: bold; direction: ltr; text-align: left; white-space: pre-wrap; }
+        .score-badge { background: #eef4ff; color: var(--main); padding: 5px 15px; border-radius: 20px; font-weight: bold; margin-bottom: 15px; display: inline-block; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>منصة بنوك الأسئلة الذكية 🩺</h1>
+    <p>أحمد أيمن - مراجعة تمريض الباطنة والجراحة 2026</p>
+</header>
+
+<div class="container">
+    <div id="main-menu">
+        <div class="card" onclick="showSub()"><h3>تمريض باطنة وجراحة</h3><p>شامل: اختر + صح وخطأ + مصطلحات + قوائم</p></div>
+    </div>
+
+    <div id="sub-menu" class="section">
+        <button class="back-btn" onclick="location.reload()">← الرئيسية</button>
+        <div class="card" onclick="startApp('tf')">30 سؤال صح أو خطأ (T/F)</div>
+        <div class="card" onclick="startApp('mcq')">30 سؤال اختر (MCQs)</div>
+        <div class="card" onclick="startApp('term')">تسميع المصطلحات (Terms)</div>
+        <div class="card" onclick="startApp('list')">تسميع القوائم (Lists)</div>
+    </div>
+
+    <div id="work-area" class="section">
+        <button class="back-btn" onclick="showSub()">← عودة</button>
+        <div id="content-display"></div>
+    </div>
+</div>
+
+<script>
+    const DATA = {
+        tf: [
+            { q: "1. Vomiting and diarrhea are not a disease, but they are symptoms of many conditions.", ans: true },
+            { q: "2. Vitamin K injected subcutaneously if prothrombin time is prolonged", ans: true },
+            { q: "3. The most common cause of bacterial pneumonia is a streptococcus pneumonia", ans: true },
+            { q: "4. The first stage of hepatitis preceding jaundice is a pro-icteric stage", ans: true },
+            { q: "5. The best position for pneumonia patient is a semi-fowler's position", ans: true },
+            { q: "6. Symptoms of hepatitis A is severe in children", ans: false },
+            { q: "7. Oliguria means less than 400 ml urine/day", ans: true },
+            { q: "8. Obesity and overweight are a primary risk factors of hypertension", ans: true },
+            { q: "9. Dialysis can't help eliminate nitrogen waste products from body.", ans: false },
+            { q: "10. Manifestation of ARF includes decrease serum phosphate and increase serum calcium.", ans: false },
+            { q: "11. Malignant tumors don't metastasize or spread to other parts or tissue of the body", ans: false },
+            { q: "12. Ischemic stroke cause by bleeding of brain blood vessels", ans: false },
+            { q: "13. Intermittent asthma symptoms interfere with daily activities", ans: false },
+            { q: "14. Initial symptoms of hepatitis caused by infection are similar to the flu", ans: true },
+            { q: "15. Dialysis is necessary if there are changes in mental status or if stop urinating", ans: true },
+            { q: "16. If fasting plasma glucose level greater than or equal to 126 mg/dl, they probably diabetes", ans: true },
+            { q: "17. Hypertensive retinopathies can lead to blindness", ans: true },
+            { q: "18. Hypertension is a short-term medical condition", ans: false },
+            { q: "19. Hyperkalemia causing dysrhythmias and arrest", ans: true },
+            { q: "20. High cholesterol and low triglycerides can lead to coronary artery disease", ans: false },
+            { q: "21. Hepatitis C is similar to HBV but more severe", ans: true },
+            { q: "22. Hemorrhagic stroke caused by vascular occlusion due to clot formation", ans: false },
+            { q: "23. Calcium and insulin can help avoid dangerous increases in blood potassium levels.", ans: true },
+            { q: "24. End-stage renal failure is a complication of ARF", ans: true },
+            { q: "25. Emergent surgery needed within 24-30 hours", ans: false },
+            { q: "26. Benign tumors can spread through the lymphatic system or bloodstream", ans: false },
+            { q: "27. Any one undergoing surgery must sign an informed consent", ans: true },
+            { q: "28. Antibiotics are used to treat viral pneumonia", ans: false },
+            { q: "29. Angina is the most common symptom of coronary artery disease", ans: true },
+            { q: "30. Acute renal failure characterized by increase BUN and decrease creatinine level", ans: false }
+        ],
+        mcqs: [
+            { q: "1. Causes of pneumonia include the following except:", opts: ["Streptococcus bacteria", "Fungi", "COVID-19", "Staphylococcus aureus"], ans: 3 },
+            { q: "2. Nursing intervention for removal of chest secretions in pneumonia:", opts: ["Adequate dehydration of 2-3 liters/day", "Chest physiotherapy", "Humidification", "All of the above"], ans: 3 },
+            { q: "3. Asthma symptoms that occur fewer than 2 days a week is:", opts: ["Mild persistent", "Intermittent"], ans: 1 },
+            { q: "4. Nighttime asthma symptoms occur 3 to 4 times a month in:", opts: ["Mild persistent", "Intermittent"], ans: 0 },
+            { q: "5. Primary hypertension can result from:", opts: ["Diabetes mellitus", "Stress and lack of exercise", "Obesity", "All of the above"], ans: 3 },
+            { q: "6. A chronic disease often called 'silent killer' is:", opts: ["Anemia", "Diabetes mellitus", "Hypertension", "Bronchial asthma"], ans: 2 },
+            { q: "7. Abnormal bulge in the wall of an artery that can burst:", opts: ["Atherosclerosis", "Blood clots", "Aneurysm", "Thrombosis"], ans: 2 },
+            { q: "8. Refers to buildup of fats, cholesterol and other substances in artery walls:", opts: ["Atherosclerosis", "Thrombosis", "Aneurysm", "DVT"], ans: 0 },
+            { q: "9. Pharmacological intervention for treatment of CAD is:", opts: ["Bronchodilators", "Vasoconstrictors", "Nitroglycerin", "ECG"], ans: 2 },
+            { q: "10. Involuntary, forceful expulsion of contents of stomach through mouth:", opts: ["Diarrhea", "Vomiting", "Dehydration", "Melena"], ans: 1 },
+            { q: "11. The second stage of hepatitis includes appearance of jaundice:", opts: ["Post-icteric stage", "Icteric stage", "Pre-icteric stage", "None"], ans: 1 },
+            { q: "12. The convalescent stage of hepatitis in which jaundice decrease is:", opts: ["Post-icteric stage", "Icteric stage", "Pre-icteric stage", "None"], ans: 0 },
+            { q: "13. Incubation period of hepatitis A virus include:", opts: ["1 week", "6 weeks", "3 to 5 weeks", "2 months"], ans: 2 },
+            { q: "14. Incubation period of hepatitis C virus includes:", opts: ["3 weeks", "6 months", "2 to 3 months", "6 weeks to several months"], ans: 3 },
+            { q: "15. Stroke results from vascular occlusion and severe hypoperfusion is:", opts: ["Ischemic stroke", "Hemorrhagic stroke", "TIA", "None"], ans: 0 },
+            { q: "16. Stroke results from bleeding into the brain tissue is:", opts: ["Ischemic stroke", "Hemorrhagic stroke", "A & B", "None"], ans: 1 },
+            { q: "17. Non-modifiable risk factor of stroke:", opts: ["Gender", "Diabetes", "Obesity", "Hypertension"], ans: 0 },
+            { q: "18. Prevention of stroke includes:", opts: ["Increase cholesterol", "Manage diabetes", "Smoking", "Lack of exercise"], ans: 1 },
+            { q: "19. Condition caused by loss of too much fluid from the body:", opts: ["Hemorrhage", "Heart failure", "Burns", "Dehydration"], ans: 3 },
+            { q: "20. Post renal cause of acute renal failure is:", opts: ["Calculi", "Infections", "Diuretics", "Heart failure"], ans: 0 },
+            { q: "21. Period of ARF accompanied by increase in serum concentration:", opts: ["Initiation", "Diuresis", "Oliguria", "Recovery"], ans: 2 },
+            { q: "22. Treatment of acute renal failure could be:", opts: ["Drink water", "Potassium diet", "Dialysis", "Low carbohydrate"], ans: 2 },
+            { q: "23. Known as juvenile diabetes or insulin dependent diabetes:", opts: ["Type 1 DM", "Gestational", "Type 2 DM", "All"], ans: 0 },
+            { q: "24. Signs of type 1 DM all the following except:", opts: ["Polyuria", "Unusual thirst", "Extreme hunger", "Stomatitis"], ans: 3 },
+            { q: "25. OGTT confirms diabetes if level is:", opts: ["Lower than 200", "Lower than 150", "Higher or equal 200", "Higher than 150"], ans: 2 },
+            { q: "26. Bone marrow unable to produce RBCs is:", opts: ["Hemolytic", "Nutritional", "Aplastic anemia", "Enzyme deficiency"], ans: 2 },
+            { q: "27. Nutritional anemia includes all the following except:", opts: ["Iron deficiency", "Folic acid", "B12 deficiency", "Hemolytic anemia"], ans: 2 },
+            { q: "28. Risk factors of cancer include all except:", opts: ["Viruses/Bacteria", "Chemical agents", "Physical agents", "Hygienic measures"], ans: 3 },
+            { q: "29. Causes of cystitis all the following except:", opts: ["UTI", "Radiation", "Metastasis", "Catheter use"], ans: 2 },
+            { q: "30. Protection oneself from radiation is done through:", opts: ["Shielding", "Immunity", "Distance", "A & C"], ans: 3 }
+        ],
+        terms: [
+            { d: "Infection that inflames the air sacs in one or both lungs.", t: "Pneumonia" },
+            { d: "Medical condition in which the blood pressure in the arteries is persistently elevated.", t: "Hypertension" },
+            { d: "Sudden loss of brain function resulting from a disruption of blood supply.", t: "Stroke" },
+            { d: "Reduction below the normal level in the number of red blood cells, hemoglobin, and packed red cells.", t: "Anemia" },
+            { d: "Occurs when the heart is unable to pump sufficiently to maintain blood flow to meet tissues needs.", t: "Heart failure" },
+            { d: "Group of diseases involving abnormal cell growth with the potential to invade or spread.", t: "Cancer" },
+            { d: "Management and treatment of the client during preoperative, intra-operative and postoperative phases.", t: "Perioperative nursing care" },
+            { d: "Sudden reversible and almost complete loss of kidney function over a period of hours to days.", t: "Acute renal failure" },
+            { d: "Metabolic diseases characterized by hyperglycemia resulting from insulin defects.", t: "Diabetes mellitus" },
+            { d: "Inflammation of the liver tissue.", t: "Hepatitis" }
+        ],
+        lists: [
+            { q: "Signs and symptoms of asthma", a: "• Cough\n• Dyspnea\n• Wheezing\n• Chest tightness" },
+            { q: "Types of anemia", a: "• Acute/chronic secondary to blood loss\n• Aplastic anemia\n• Hemolytic anemia\n• Enzyme deficiency anemia\n• Nutritional anemia" },
+            { q: "Lifestyle changes to reduce hypertension", a: "• Lose weight\n• Exercise regularly\n• Reducing salt intake\n• Avoiding use of tobacco\n• Healthy diet (DASH diet)" },
+            { q: "Nursing management for seizures", a: "• Loosen clothing\n• Maintain patent airway\n• Protect patient's head\n• Do not restrain\n• Lateral position\n• Provide privacy" },
+            { q: "Clinical manifestation of heart failure", a: "• Excessive fatigue\n• Sudden weight gain\n• Shortness of breath\n• Leg and ankle swelling (edema)\n• Tachycardia\n• Persistent cough" },
+            { q: "Risk factors of cancer", a: "• Viruses and bacteria\n• Chemical agents\n• Physical agents\n• Genetics\n• Lifestyle factors" },
+            { q: "Phases of Perioperative nursing", a: "• Preoperative phase\n• Intra-operative phase\n• Postoperative phase" },
+            { q: "Complications of acute renal failure", a: "• Hyperkalemia\n• Metabolic acidosis\n• Pericarditis\n• Pulmonary edema" },
+            { q: "Signs and symptoms of Type 1 Diabetes", a: "• Polyuria\n• Polydipsia (thirst)\n• Polyphagia (hunger)\n• Unusual weight loss\n• Extreme fatigue" },
+            { q: "Causes of Hepatitis", a: "• Viruses (A,B,C,D,E)\n• Alcohol abuse\n• Medications\n• Autoimmune diseases" }
+        ]
+    };
+
+    let state = { tf: 0, mcq: 0, term: 0, list: 0 };
+    let score = 0;
+
+    function showSub() {
+        document.getElementById('main-menu').style.display = 'none';
+        document.getElementById('work-area').style.display = 'none';
+        document.getElementById('sub-menu').style.display = 'block';
+    }
+
+    function startApp(type) {
+        document.getElementById('sub-menu').style.display = 'none';
+        document.getElementById('work-area').style.display = 'block';
+        state = { tf: 0, mcq: 0, term: 0, list: 0 };
+        score = 0;
+        if(type === 'tf') loadTf();
+        if(type === 'mcq') loadMcq();
+        if(type === 'term') loadTerm();
+        if(type === 'list') loadList();
+    }
+
+    function loadTf() {
+        if(state.tf >= DATA.tf.length) { renderFinish(DATA.tf.length); return; }
+        let item = DATA.tf[state.tf];
+        document.getElementById('content-display').innerHTML = `
+            <div class="score-badge">الدرجة: ${score}</div>
+            <p style="color:var(--main)">Question ${state.tf + 1} of 30</p>
+            <div class="q-box">${item.q}</div>
+            <button class="btn" style="background:var(--success)" onclick="validateTf(true)">True</button>
+            <button class="btn" style="background:var(--error)" onclick="validateTf(false)">False</button>
+            <div id="feedback" class="feedback"></div>`;
+    }
+
+    function validateTf(userAns) {
+        let item = DATA.tf[state.tf];
+        let f = document.getElementById('feedback'); f.style.display = 'block';
+        if(userAns === item.ans) { f.innerHTML = "Correct! ✅"; score++; f.style.background = "var(--success)"; } 
+        else { f.innerHTML = "Wrong! ❌ Correct: " + (item.ans ? "True" : "False"); f.style.background = "var(--error)"; }
+        f.style.color = "white";
+        setTimeout(() => { state.tf++; loadTf(); }, 800);
+    }
+
+    function loadMcq() {
+        if(state.mcq >= DATA.mcqs.length) { renderFinish(DATA.mcqs.length); return; }
+        let item = DATA.mcqs[state.mcq];
+        let html = `<div class="score-badge">الدرجة: ${score}</div><p style="color:var(--main)">Question ${state.mcq + 1} of 30</p><div class="q-box">${item.q}</div>`;
+        item.opts.forEach((o, i) => html += `<div class="opt" onclick="validateMcq(this, ${i})">${o}</div>`);
+        document.getElementById('content-display').innerHTML = html;
+    }
+
+    function validateMcq(el, index) {
+        let correct = DATA.mcqs[state.mcq].ans;
+        let options = document.querySelectorAll('.opt');
+        options.forEach(opt => opt.style.pointerEvents = 'none');
+        if(index === correct) { el.classList.add('correct'); score++; } 
+        else { el.classList.add('wrong'); options[correct].classList.add('correct'); }
+        setTimeout(() => { state.mcq++; loadMcq(); }, 1200);
+    }
+
+    function loadTerm() {
+        if(state.term >= DATA.terms.length) { renderFinish(DATA.terms.length); return; }
+        let item = DATA.terms[state.term];
+        document.getElementById('content-display').innerHTML = `
+            <div class="score-badge">الدرجة: ${score}</div>
+            <h3>Type the medical term for:</h3>
+            <div class="q-box">${item.d}</div>
+            <input type="text" id="term-input" placeholder="Type term here..." autofocus>
+            <button class="btn" onclick="validateTerm()">Confirm Answer</button>
+            <div id="feedback" class="feedback"></div>`;
+    }
+
+    function validateTerm() {
+        let input = document.getElementById('term-input').value.trim().toLowerCase();
+        let correct = DATA.terms[state.term].t.toLowerCase();
+        let f = document.getElementById('feedback'); f.style.display = 'block';
+        if(correct.includes(input) && input.length > 2) { 
+            f.innerHTML = "Correct! ✅ " + DATA.terms[state.term].t; f.style.background = "var(--success)";
+            score++; 
+        } else { 
+            f.innerHTML = "Wrong! ❌ Correct: " + DATA.terms[state.term].t; f.style.background = "var(--error)";
+        }
+        f.style.color = "white";
+        setTimeout(() => { state.term++; loadTerm(); }, 1200);
+    }
+
+    function loadList() {
+        if(state.list >= DATA.lists.length) { renderFinish(0, true); return; }
+        let item = DATA.lists[state.list];
+        document.getElementById('content-display').innerHTML = `
+            <h3>List Question (${state.list + 1}/10):</h3>
+            <div class="q-box" style="direction:rtl; text-align:right;">${item.q}</div>
+            <textarea id="list-input" rows="5" placeholder="Write here..."></textarea>
+            <button class="btn" onclick="document.getElementById('f-list').style.display='block'; document.getElementById('n-list').style.display='block'">Show Model Answer</button>
+            <div id="f-list" class="feedback" style="display:none; background:#eef; color:#333; border:1px solid #ccd;">${item.a}</div>
+            <button id="n-list" class="btn" style="display:none; margin-top:10px" onclick="state.list++; loadList()">Next Question</button>`;
+    }
+
+    function renderFinish(total, isList = false) {
+        let msg = isList ? "أحسنت! انتهيت من مراجعة القوائم. 🏆" : `نتيجتك النهائية: ${score} من أصل ${total}`;
+        document.getElementById('content-display').innerHTML = `
+            <div style="text-align:center">
+                <h2>انتهى الاختبار!</h2>
+                <h3>${msg}</h3>
+                <button class="btn" onclick="location.reload()">العودة للقائمة الرئيسية</button>
+            </div>`;
+    }
+</script>
+</body>
+</html>
