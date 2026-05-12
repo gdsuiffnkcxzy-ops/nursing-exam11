@@ -12,18 +12,30 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Install dependencies
-        run: npm install
-      - name: Build
-        run: npm run build
+
+      - name: Install and Build
+        run: |
+          if [ -d "project" ]; then
+            cd project
+            npm install
+            npm run build
+          else
+            npm install
+            npm run build
+          fi
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./dist
+          # هذا السطر يرفع الملفات الناتجة عن البناء (dist) سواء كانت داخل المجلد أو خارجه
+          path: ${{ github.workspace }}/project/dist/ 
+          # ملاحظة: إذا قمت بنقل الملفات للخارج، غير المسار أعلاه ليكون ./dist
+
   deploy:
     environment:
       name: github-pages
@@ -34,4 +46,4 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-
+        
